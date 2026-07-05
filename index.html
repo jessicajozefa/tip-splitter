@@ -10,7 +10,7 @@
       margin: 0;
       padding: 20px;
       transition: 0.3s;
-      background: #ffffff;
+      background: #fff;
       color: #111;
     }
 
@@ -31,6 +31,7 @@
       padding: 10px 14px;
       margin: 5px;
       border-radius: 8px;
+      cursor: pointer;
     }
 
     .save-btn {
@@ -39,7 +40,6 @@
       background: #2ecc71;
       color: white;
       border: none;
-      cursor: pointer;
     }
 
     .card {
@@ -68,9 +68,7 @@
 <body>
 
 <h2>Offline Savings Tracker</h2>
-<p><b>Post-work quick entry mode</b></p>
 
-<!-- END OF DAY BUTTON -->
 <button onclick="todaySummary()">End-of-Day Summary</button>
 <button onclick="toggleDark()">Dark Mode</button>
 
@@ -89,7 +87,7 @@
 </div>
 
 <div class="card">
-  <h3>Breakdown</h3>
+  <h3>Breakdown (Latest Entry)</h3>
   <div id="output"></div>
 </div>
 
@@ -134,12 +132,10 @@ function quickAdd(val) {
 }
 
 function sum(key) {
-  return history.reduce((a, b) => a + (b[key] || 0), 0).toFixed(2);
+  return history.reduce((a, b) => a + (b[key] || 0), 0);
 }
 
-/* ---------------------------
-   MAIN UI UPDATE FUNCTION
-----------------------------*/
+/* ---------------- UI ---------------- */
 function updateUI() {
 
   let last = history[history.length - 1];
@@ -147,49 +143,45 @@ function updateUI() {
   document.getElementById("output").innerHTML = last ? `
     <div class="row">
       <div class="box">Rent: $${last.rent.toFixed(2)}</div>
-      <div class="box">CC: $${last.cc.toFixed(2)}</div>
+      <div class="box">CC (this entry): $${last.cc.toFixed(2)}</div>
       <div class="box">Taxes: $${last.taxes.toFixed(2)}</div>
       <div class="box">Insurance: $${last.insurance.toFixed(2)}</div>
       <div class="box">IRA: $${last.ira.toFixed(2)}</div>
     </div>
   ` : "";
 
-  let totalEntered = sum("amount");
-  let rent = sum("rent");
-  let cc = sum("cc");
-  let taxes = sum("taxes");
-  let insurance = sum("insurance");
-  let ira = sum("ira");
+  // TOTALS (ALL TIME)
+  let totalSpent = sum("amount");
+  let ccTotalAllTime = sum("cc");
 
-  // MONTHLY GUARDRAIL
+  // MONTH FILTER
   let now = new Date();
   let month = now.getMonth();
   let year = now.getFullYear();
 
-  let monthTotal = history
-    .filter(h => {
-      let d = new Date(h.time);
-      return d.getMonth() === month && d.getFullYear() === year;
-    })
-    .reduce((a, b) => a + b.amount, 0);
+  let monthItems = history.filter(h => {
+    let d = new Date(h.time);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
 
-  let cap = 2000;
+  let monthTotal = monthItems.reduce((a, b) => a + b.amount, 0);
+  let ccMonthly = monthItems.reduce((a, b) => a + b.cc, 0);
+
+  let ccCap = 2000;
 
   document.getElementById("totals").innerHTML = `
-    <p><b>Total Entered:</b> $${totalEntered}</p>
-    <p><b>Rent:</b> $${rent}</p>
-    <p><b>Credit Card:</b> $${cc}</p>
-    <p><b>Taxes:</b> $${taxes}</p>
-    <p><b>Insurance:</b> $${insurance}</p>
-    <p><b>IRA:</b> $${ira}</p>
+    <p><b>Total Spent (All Time):</b> $${totalSpent.toFixed(2)}</p>
 
     <hr/>
 
-    <p><b>Monthly Progress:</b> $${monthTotal.toFixed(2)} / $${cap}</p>
+    <p><b>Monthly Spending:</b> $${monthTotal.toFixed(2)}</p>
+
+    <p><b>CC Usage:</b> $${ccMonthly.toFixed(2)} / $${ccCap}</p>
+
     <p><b>Status:</b> ${
-      monthTotal > cap
-        ? "⚠️ OVER BUDGET"
-        : monthTotal > cap * 0.8
+      ccMonthly > ccCap
+        ? "⚠️ OVER CC LIMIT"
+        : ccMonthly > ccCap * 0.8
         ? "⚠️ CLOSE TO LIMIT"
         : "OK"
     }</p>
@@ -202,9 +194,7 @@ function updateUI() {
     .join("");
 }
 
-/* ---------------------------
-   END OF DAY SUMMARY
-----------------------------*/
+/* -------- END OF DAY -------- */
 function todaySummary() {
   let today = new Date().toDateString();
 
