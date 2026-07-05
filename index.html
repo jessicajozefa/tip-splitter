@@ -42,18 +42,6 @@ button {
   margin-top: 15px;
   border-radius: 10px;
 }
-
-.bar {
-  height: 14px;
-  background: #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.fill {
-  height: 100%;
-  background: #2ecc71;
-}
 </style>
 </head>
 
@@ -62,7 +50,6 @@ button {
 <h2>Tip Flow System</h2>
 
 <button onclick="toggleDark()">Dark Mode</button>
-<button onclick="summary()">Today Summary</button>
 
 <br/><br/>
 
@@ -71,37 +58,28 @@ button {
 
 <button class="save" onclick="addTip()">SAVE TIP</button>
 
-<div>
+<br/>
+
 <button onclick="quick(20)">$20</button>
 <button onclick="quick(50)">$50</button>
 <button onclick="quick(100)">$100</button>
-</div>
+
+<br/><br/>
+
+<!-- CONTROL BUTTONS -->
+<button onclick="clearAll()" style="background:#e74c3c;color:white;">Clear All</button>
+<button onclick="undoLast()" style="background:#f39c12;color:white;">Undo Last</button>
+<button onclick="resetToday()" style="background:#3498db;color:white;">Reset Today</button>
+<button onclick="resetMonth()" style="background:#9b59b6;color:white;">Reset Month</button>
 
 <div class="card">
-<h3>Latest Tip Breakdown</h3>
+<h3>Latest Tip</h3>
 <div id="latest"></div>
 </div>
 
 <div class="card">
-<h3>System Totals</h3>
-
-<p><b>Total Tips:</b> $<span id="total"></span></p>
-
-<p><b>Rent (30%):</b> $<span id="rent"></span></p>
-
-<p><b>CC (40%):</b> $<span id="cc"></span> / $2000</p>
-
-<p><b>Taxes (12%):</b> $<span id="tax"></span></p>
-
-<p><b>Insurance (12.4%):</b> $<span id="ins"></span></p>
-
-<p><b>IRA (5.6%):</b> $<span id="ira"></span></p>
-
-<br/>
-
-<div>CC Progress</div>
-<div class="bar"><div id="ccBar" class="fill"></div></div>
-
+<h3>Totals</h3>
+<div id="totals"></div>
 </div>
 
 <div class="card">
@@ -113,23 +91,25 @@ button {
 
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
+function save() {
+  localStorage.setItem("tips", JSON.stringify(tips));
+}
+
 function addTip() {
   let val = parseFloat(document.getElementById("amount").value);
   if (!val) return;
 
-  let entry = {
+  tips.push({
     amount: val,
-    rent: val * 0.30,
     cc: val * 0.40,
+    rent: val * 0.30,
     tax: val * 0.12,
     ins: val * 0.124,
     ira: val * 0.056,
     time: new Date().toLocaleString()
-  };
+  });
 
-  tips.push(entry);
-  localStorage.setItem("tips", JSON.stringify(tips));
-
+  save();
   document.getElementById("amount").value = "";
   update();
 }
@@ -146,31 +126,27 @@ function sum(k){
 function update(){
 
   let total = sum("amount");
-  let rent = sum("rent");
   let cc = sum("cc");
+  let rent = sum("rent");
   let tax = sum("tax");
   let ins = sum("ins");
   let ira = sum("ira");
 
   let ccCap = 2000;
 
-  document.getElementById("total").innerText = total.toFixed(2);
-  document.getElementById("rent").innerText = rent.toFixed(2);
-  document.getElementById("cc").innerText = cc.toFixed(2);
-  document.getElementById("tax").innerText = tax.toFixed(2);
-  document.getElementById("ins").innerText = ins.toFixed(2);
-  document.getElementById("ira").innerText = ira.toFixed(2);
-
-  document.getElementById("ccBar").style.width =
-    Math.min((cc/ccCap)*100,100) + "%";
-
   document.getElementById("latest").innerHTML =
     tips.length
-      ? `
-        <p>$${tips[tips.length-1].amount}</p>
-        <p>CC: $${tips[tips.length-1].cc.toFixed(2)}</p>
-      `
+      ? `<p>$${tips[tips.length-1].amount} (CC: $${tips[tips.length-1].cc.toFixed(2)})</p>`
       : "";
+
+  document.getElementById("totals").innerHTML = `
+    <p><b>Total Tips:</b> $${total.toFixed(2)}</p>
+    <p><b>CC:</b> $${cc.toFixed(2)} / $${ccCap}</p>
+    <p><b>Rent:</b> $${rent.toFixed(2)}</p>
+    <p><b>Taxes:</b> $${tax.toFixed(2)}</p>
+    <p><b>Insurance:</b> $${ins.toFixed(2)}</p>
+    <p><b>IRA:</b> $${ira.toFixed(2)}</p>
+  `;
 
   document.getElementById("history").innerHTML =
     tips.slice().reverse()
@@ -178,16 +154,43 @@ function update(){
     .join("<br>");
 }
 
-function summary(){
+/* =======================
+   CONTROL FUNCTIONS
+======================= */
+
+function clearAll(){
+  if(!confirm("Clear ALL data?")) return;
+  tips = [];
+  save();
+  update();
+}
+
+function undoLast(){
+  if(!tips.length) return;
+  tips.pop();
+  save();
+  update();
+}
+
+function resetToday(){
   let today = new Date().toDateString();
+  tips = tips.filter(t => new Date(t.time).toDateString() !== today);
+  save();
+  update();
+}
 
-  let todayTips = tips.filter(t =>
-    new Date(t.time).toDateString() === today
-  );
+function resetMonth(){
+  let now = new Date();
+  let m = now.getMonth();
+  let y = now.getFullYear();
 
-  let total = todayTips.reduce((a,b)=>a+b.amount,0);
+  tips = tips.filter(t => {
+    let d = new Date(t.time);
+    return !(d.getMonth() === m && d.getFullYear() === y);
+  });
 
-  alert("Today: $" + total.toFixed(2) + " across " + todayTips.length + " tips");
+  save();
+  update();
 }
 
 function toggleDark(){
