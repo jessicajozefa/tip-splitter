@@ -2,14 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Finance Control Dashboard</title>
+<title>Tip Flow System - Goal Mode</title>
 
 <style>
 body {
   font-family: Arial;
   margin: 0;
   padding: 20px;
-  transition: 0.3s;
   background: #fff;
   color: #111;
 }
@@ -18,7 +17,7 @@ body {
 
 input {
   font-size: 20px;
-  padding: 12px;
+  padding: 10px;
   width: 90%;
   max-width: 300px;
 }
@@ -30,7 +29,7 @@ button {
 }
 
 .save {
-  font-size: 24px;
+  font-size: 22px;
   background: #2ecc71;
   color: white;
   border: none;
@@ -48,7 +47,6 @@ button {
   background: #ddd;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 5px;
 }
 
 .fill {
@@ -60,39 +58,41 @@ button {
 
 <body>
 
-<h2>Finance Control Dashboard</h2>
+<h2>Tip Flow System (Goal Mode)</h2>
 
 <button onclick="toggleDark()">Dark Mode</button>
-<button onclick="todaySummary()">End-of-Day Summary</button>
+<button onclick="summary()">Today Summary</button>
 
 <br/><br/>
 
-<input id="amount" type="number" placeholder="Enter income or spend" />
+<input id="amount" type="number" placeholder="Enter tip" />
 <br/>
 
-<button class="save" onclick="addEntry()">SAVE</button>
+<input id="goal" type="number" placeholder="Savings Goal (e.g. 3000)" />
+<br/>
+
+<button class="save" onclick="addTip()">SAVE TIP</button>
 
 <div>
-<button onclick="quickAdd(100)">$100</button>
-<button onclick="quickAdd(200)">$200</button>
-<button onclick="quickAdd(500)">$500</button>
+<button onclick="quick(20)">$20</button>
+<button onclick="quick(50)">$50</button>
+<button onclick="quick(100)">$100</button>
 </div>
 
 <div class="card">
-<h3>Paycheck Split Preview</h3>
-<div id="split"></div>
+<h3>Goal Progress</h3>
+
+<p><b>Goal:</b> $<span id="goalDisplay">0</span></p>
+<p><b>Saved (from tips):</b> $<span id="saved">0</span></p>
+
+<div class="bar"><div id="goalBar" class="fill"></div></div>
+
+<p id="goalStatus"></p>
 </div>
 
 <div class="card">
-<h3>Monthly Control</h3>
-
-<div>CC Progress</div>
-<div class="bar"><div id="ccBar" class="fill"></div></div>
-
-<div>Spending Progress</div>
-<div class="bar"><div id="spendBar" class="fill"></div></div>
-
-<div id="status"></div>
+<h3>Latest Tip Breakdown</h3>
+<div id="latest"></div>
 </div>
 
 <div class="card">
@@ -102,103 +102,86 @@ button {
 
 <script>
 
-let history = JSON.parse(localStorage.getItem("history") || "[]");
+let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
-function addEntry() {
+function addTip() {
+
   let val = parseFloat(document.getElementById("amount").value);
   if (!val) return;
 
-  history.push({
+  let entry = {
     amount: val,
-    rent: val * 0.30,
     cc: val * 0.40,
-    taxes: val * 0.12,
-    insurance: val * 0.124,
-    ira: val * 0.056,
     time: new Date().toLocaleString()
-  });
+  };
 
-  localStorage.setItem("history", JSON.stringify(history));
+  tips.push(entry);
+  localStorage.setItem("tips", JSON.stringify(tips));
+
   document.getElementById("amount").value = "";
-  updateUI();
+  update();
 }
 
-function quickAdd(v){
+function quick(v){
   document.getElementById("amount").value = v;
-  addEntry();
+  addTip();
 }
 
-function sum(k){ return history.reduce((a,b)=>a+(b[k]||0),0); }
-
-/* -------- PAYCHECK SPLIT -------- */
-function renderSplit() {
-  let val = parseFloat(document.getElementById("amount").value || 0);
-
-  document.getElementById("split").innerHTML = `
-    <p>Rent: $${(val*0.30).toFixed(2)}</p>
-    <p>CC: $${(val*0.40).toFixed(2)}</p>
-    <p>Taxes: $${(val*0.12).toFixed(2)}</p>
-    <p>Insurance: $${(val*0.124).toFixed(2)}</p>
-    <p>IRA: $${(val*0.056).toFixed(2)}</p>
-  `;
+function sum(k){
+  return tips.reduce((a,b)=>a+(b[k]||0),0);
 }
 
-/* -------- UI -------- */
-function updateUI(){
+function update(){
 
-  let now = new Date();
-  let m = now.getMonth();
-  let y = now.getFullYear();
+  let goal = parseFloat(document.getElementById("goal").value || 0);
 
-  let month = history.filter(h=>{
-    let d=new Date(h.time);
-    return d.getMonth()==m && d.getFullYear()==y;
-  });
+  let saved = sum("amount");
 
-  let cc = month.reduce((a,b)=>a+b.cc,0);
-  let spend = month.reduce((a,b)=>a+b.amount,0);
+  document.getElementById("goalDisplay").innerText = goal.toFixed(2);
+  document.getElementById("saved").innerText = saved.toFixed(2);
 
-  let ccCap = 2000;
-  let spendCap = 4000;
+  let pct = goal ? (saved / goal) * 100 : 0;
 
-  // bars
-  document.getElementById("ccBar").style.width =
-    Math.min((cc/ccCap)*100,100)+"%";
+  document.getElementById("goalBar").style.width =
+    Math.min(pct, 100) + "%";
 
-  document.getElementById("spendBar").style.width =
-    Math.min((spend/spendCap)*100,100)+"%";
+  document.getElementById("goalStatus").innerText =
+    goal
+      ? (saved >= goal
+          ? "✅ Goal reached"
+          : "You are " + (goal - saved).toFixed(2) + " away")
+      : "Set a goal to start tracking";
 
-  // status
-  let safeToday = Math.max(0, (spendCap - spend)/30);
-
-  document.getElementById("status").innerHTML = `
-    <p><b>CC:</b> $${cc.toFixed(2)} / $${ccCap}</p>
-    <p><b>Spending:</b> $${spend.toFixed(2)} / $${spendCap}</p>
-    <p><b>Safe to spend today:</b> ~$${safeToday.toFixed(2)}</p>
-  `;
+  document.getElementById("latest").innerHTML =
+    tips.length
+      ? `<p>$${tips[tips.length-1].amount}</p>`
+      : "";
 
   document.getElementById("history").innerHTML =
-    history.slice().reverse()
-    .map(h=>`$${h.amount} — ${h.time}`)
+    tips.slice().reverse()
+    .map(t => `$${t.amount} — ${t.time}`)
     .join("<br>");
 }
 
-/* -------- SUMMARY -------- */
-function todaySummary(){
-  let t=new Date().toDateString();
+function summary(){
+  let today = new Date().toDateString();
 
-  let items=history.filter(h=>new Date(h.time).toDateString()==t);
+  let todayTips = tips.filter(t =>
+    new Date(t.time).toDateString() === today
+  );
 
-  alert("Today: "+items.length+" entries");
+  let total = todayTips.reduce((a,b)=>a+b.amount,0);
+
+  alert("Today: $" + total.toFixed(2) + " across " + todayTips.length + " tips");
 }
 
 function toggleDark(){
   document.body.classList.toggle("dark");
 }
 
-document.getElementById("amount").addEventListener("input", renderSplit);
+document.getElementById("goal").addEventListener("input", update);
 
-updateUI();
+update();
 
 </script>
 
