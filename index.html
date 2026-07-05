@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Offline Savings Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      transition: 0.3s;
+      background: #ffffff;
+      color: #111;
+    }
+
+    .dark {
+      background: #111;
+      color: #eee;
+    }
+
+    input {
+      font-size: 22px;
+      padding: 15px;
+      width: 90%;
+      max-width: 300px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 18px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .save-btn {
+      font-size: 26px;
+      padding: 20px 40px;
+      background: #2ecc71;
+      color: white;
+      border: none;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 10px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .box {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Offline Savings Tracker</h2>
+<p><b>Post-work quick entry mode</b></p>
+
+<input id="amount" type="number" placeholder="Enter amount" />
+
+<br/>
+
+<button class="save-btn" onclick="addEntry()">SAVE ENTRY</button>
+<button onclick="toggleDark()">Dark Mode</button>
+
+<br/>
+
+<div>
+  <button onclick="quickAdd(20)">$20</button>
+  <button onclick="quickAdd(50)">$50</button>
+  <button onclick="quickAdd(100)">$100</button>
+</div>
+
+<div class="card">
+  <h3>Breakdown</h3>
+  <div id="output"></div>
+</div>
+
+<div class="card">
+  <h3>Totals</h3>
+  <div id="totals"></div>
+</div>
+
+<div class="card">
+  <h3>History</h3>
+  <div id="history"></div>
+</div>
+
+<script>
+let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+function addEntry() {
+  let val = parseFloat(document.getElementById("amount").value);
+  if (!val) return;
+
+  let entry = {
+    amount: val,
+    rent: val * 0.30,
+    cc: val * 0.40,
+    taxes: val * 0.12,
+    insurance: val * 0.124,
+    ira: val * 0.056,
+    time: new Date().toLocaleString()
+  };
+
+  history.push(entry);
+  localStorage.setItem("history", JSON.stringify(history));
+
+  document.getElementById("amount").value = "";
+  updateUI();
+}
+
+function quickAdd(val) {
+  document.getElementById("amount").value = val;
+  addEntry();
+}
+
+function sum(key) {
+  return history.reduce((a, b) => a + (b[key] || 0), 0).toFixed(2);
+}
+
+function updateUI() {
+  let last = history[history.length - 1];
+
+  document.getElementById("output").innerHTML = last ? `
+    <div class="row">
+      <div class="box">Rent: $${last.rent.toFixed(2)}</div>
+      <div class="box">CC: $${last.cc.toFixed(2)}</div>
+      <div class="box">Taxes: $${last.taxes.toFixed(2)}</div>
+      <div class="box">Insurance: $${last.insurance.toFixed(2)}</div>
+      <div class="box">IRA: $${last.ira.toFixed(2)}</div>
+    </div>
+  ` : "";
+
+  document.getElementById("totals").innerHTML = `
+    <p><b>Total Entered:</b> $${sum("amount")}</p>
+    <p><b>Rent:</b> $${sum("rent")}</p>
+    <p><b>Credit Card:</b> $${sum("cc")}</p>
+    <p><b>Taxes:</b> $${sum("taxes")}</p>
+    <p><b>Insurance:</b> $${sum("insurance")}</p>
+    <p><b>IRA:</b> $${sum("ira")}</p>
+  `;
+
+  document.getElementById("history").innerHTML = history
+    .slice()
+    .reverse()
+    .map(h => `<div>$${h.amount} — ${h.time}</div>`)
+    .join("");
+}
+
+function toggleDark() {
+  document.body.classList.toggle("dark");
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
+🚀 AFTER YOU PASTE IT
+Click Commit new file
+Go to Settings → Pages
+Set:
+Branch: main
+Folder: /root
+Save
+
+Wait ~1 minute.
+
+If anything breaks, just tell me:
+
+“blank page”
+“404”
+“no Pages option”
+“saved but not working”
+
+and I’ll fix it fast.
