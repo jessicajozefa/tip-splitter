@@ -1,104 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Offline Savings Tracker</title>
+<meta charset="UTF-8" />
+<title>Finance Control Dashboard</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      transition: 0.3s;
-      background: #fff;
-      color: #111;
-    }
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  padding: 20px;
+  transition: 0.3s;
+  background: #fff;
+  color: #111;
+}
 
-    .dark {
-      background: #111;
-      color: #eee;
-    }
+.dark { background:#111; color:#eee; }
 
-    input {
-      font-size: 22px;
-      padding: 15px;
-      width: 90%;
-      max-width: 300px;
-    }
+input {
+  font-size: 20px;
+  padding: 12px;
+  width: 90%;
+  max-width: 300px;
+}
 
-    button {
-      font-size: 16px;
-      padding: 10px 14px;
-      margin: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+button {
+  padding: 10px 14px;
+  margin: 5px;
+  border-radius: 8px;
+}
 
-    .save-btn {
-      font-size: 26px;
-      padding: 18px 40px;
-      background: #2ecc71;
-      color: white;
-      border: none;
-    }
+.save {
+  font-size: 24px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+}
 
-    .card {
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 10px;
-    }
+.card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+}
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+.bar {
+  height: 14px;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
 
-    .box {
-      flex: 1;
-      min-width: 140px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-  </style>
+.fill {
+  height: 100%;
+  background: #2ecc71;
+}
+</style>
 </head>
 
 <body>
 
-<h2>Offline Savings Tracker</h2>
+<h2>Finance Control Dashboard</h2>
 
-<button onclick="todaySummary()">End-of-Day Summary</button>
 <button onclick="toggleDark()">Dark Mode</button>
+<button onclick="todaySummary()">End-of-Day Summary</button>
 
 <br/><br/>
 
-<input id="amount" type="number" placeholder="Enter amount" />
-
+<input id="amount" type="number" placeholder="Enter income or spend" />
 <br/>
 
-<button class="save-btn" onclick="addEntry()">SAVE ENTRY</button>
+<button class="save" onclick="addEntry()">SAVE</button>
 
 <div>
-  <button onclick="quickAdd(20)">$20</button>
-  <button onclick="quickAdd(50)">$50</button>
-  <button onclick="quickAdd(100)">$100</button>
+<button onclick="quickAdd(100)">$100</button>
+<button onclick="quickAdd(200)">$200</button>
+<button onclick="quickAdd(500)">$500</button>
 </div>
 
 <div class="card">
-  <h3>Breakdown (Latest Entry)</h3>
-  <div id="output"></div>
+<h3>Paycheck Split Preview</h3>
+<div id="split"></div>
 </div>
 
 <div class="card">
-  <h3>Totals</h3>
-  <div id="totals"></div>
+<h3>Monthly Control</h3>
+
+<div>CC Progress</div>
+<div class="bar"><div id="ccBar" class="fill"></div></div>
+
+<div>Spending Progress</div>
+<div class="bar"><div id="spendBar" class="fill"></div></div>
+
+<div id="status"></div>
 </div>
 
 <div class="card">
-  <h3>History</h3>
-  <div id="history"></div>
+<h3>History</h3>
+<div id="history"></div>
 </div>
 
 <script>
@@ -109,7 +108,7 @@ function addEntry() {
   let val = parseFloat(document.getElementById("amount").value);
   if (!val) return;
 
-  let entry = {
+  history.push({
     amount: val,
     rent: val * 0.30,
     cc: val * 0.40,
@@ -117,103 +116,87 @@ function addEntry() {
     insurance: val * 0.124,
     ira: val * 0.056,
     time: new Date().toLocaleString()
-  };
+  });
 
-  history.push(entry);
   localStorage.setItem("history", JSON.stringify(history));
-
   document.getElementById("amount").value = "";
   updateUI();
 }
 
-function quickAdd(val) {
-  document.getElementById("amount").value = val;
+function quickAdd(v){
+  document.getElementById("amount").value = v;
   addEntry();
 }
 
-function sum(key) {
-  return history.reduce((a, b) => a + (b[key] || 0), 0);
+function sum(k){ return history.reduce((a,b)=>a+(b[k]||0),0); }
+
+/* -------- PAYCHECK SPLIT -------- */
+function renderSplit() {
+  let val = parseFloat(document.getElementById("amount").value || 0);
+
+  document.getElementById("split").innerHTML = `
+    <p>Rent: $${(val*0.30).toFixed(2)}</p>
+    <p>CC: $${(val*0.40).toFixed(2)}</p>
+    <p>Taxes: $${(val*0.12).toFixed(2)}</p>
+    <p>Insurance: $${(val*0.124).toFixed(2)}</p>
+    <p>IRA: $${(val*0.056).toFixed(2)}</p>
+  `;
 }
 
-/* ---------------- UI ---------------- */
-function updateUI() {
+/* -------- UI -------- */
+function updateUI(){
 
-  let last = history[history.length - 1];
-
-  document.getElementById("output").innerHTML = last ? `
-    <div class="row">
-      <div class="box">Rent: $${last.rent.toFixed(2)}</div>
-      <div class="box">CC (this entry): $${last.cc.toFixed(2)}</div>
-      <div class="box">Taxes: $${last.taxes.toFixed(2)}</div>
-      <div class="box">Insurance: $${last.insurance.toFixed(2)}</div>
-      <div class="box">IRA: $${last.ira.toFixed(2)}</div>
-    </div>
-  ` : "";
-
-  // TOTALS (ALL TIME)
-  let totalSpent = sum("amount");
-  let ccTotalAllTime = sum("cc");
-
-  // MONTH FILTER
   let now = new Date();
-  let month = now.getMonth();
-  let year = now.getFullYear();
+  let m = now.getMonth();
+  let y = now.getFullYear();
 
-  let monthItems = history.filter(h => {
-    let d = new Date(h.time);
-    return d.getMonth() === month && d.getFullYear() === year;
+  let month = history.filter(h=>{
+    let d=new Date(h.time);
+    return d.getMonth()==m && d.getFullYear()==y;
   });
 
-  let monthTotal = monthItems.reduce((a, b) => a + b.amount, 0);
-  let ccMonthly = monthItems.reduce((a, b) => a + b.cc, 0);
+  let cc = month.reduce((a,b)=>a+b.cc,0);
+  let spend = month.reduce((a,b)=>a+b.amount,0);
 
   let ccCap = 2000;
+  let spendCap = 4000;
 
-  document.getElementById("totals").innerHTML = `
-    <p><b>Total Spent (All Time):</b> $${totalSpent.toFixed(2)}</p>
+  // bars
+  document.getElementById("ccBar").style.width =
+    Math.min((cc/ccCap)*100,100)+"%";
 
-    <hr/>
+  document.getElementById("spendBar").style.width =
+    Math.min((spend/spendCap)*100,100)+"%";
 
-    <p><b>Monthly Spending:</b> $${monthTotal.toFixed(2)}</p>
+  // status
+  let safeToday = Math.max(0, (spendCap - spend)/30);
 
-    <p><b>CC Usage:</b> $${ccMonthly.toFixed(2)} / $${ccCap}</p>
-
-    <p><b>Status:</b> ${
-      ccMonthly > ccCap
-        ? "⚠️ OVER CC LIMIT"
-        : ccMonthly > ccCap * 0.8
-        ? "⚠️ CLOSE TO LIMIT"
-        : "OK"
-    }</p>
+  document.getElementById("status").innerHTML = `
+    <p><b>CC:</b> $${cc.toFixed(2)} / $${ccCap}</p>
+    <p><b>Spending:</b> $${spend.toFixed(2)} / $${spendCap}</p>
+    <p><b>Safe to spend today:</b> ~$${safeToday.toFixed(2)}</p>
   `;
 
-  document.getElementById("history").innerHTML = history
-    .slice()
-    .reverse()
-    .map(h => `<div>$${h.amount} — ${h.time}</div>`)
-    .join("");
+  document.getElementById("history").innerHTML =
+    history.slice().reverse()
+    .map(h=>`$${h.amount} — ${h.time}`)
+    .join("<br>");
 }
 
-/* -------- END OF DAY -------- */
-function todaySummary() {
-  let today = new Date().toDateString();
+/* -------- SUMMARY -------- */
+function todaySummary(){
+  let t=new Date().toDateString();
 
-  let todayItems = history.filter(h =>
-    new Date(h.time).toDateString() === today
-  );
+  let items=history.filter(h=>new Date(h.time).toDateString()==t);
 
-  let total = todayItems.reduce((a, b) => a + b.amount, 0);
-
-  alert(
-    "Today Summary:\n" +
-    "Entries: " + todayItems.length + "\n" +
-    "Total: $" + total.toFixed(2)
-  );
+  alert("Today: "+items.length+" entries");
 }
 
-function toggleDark() {
+function toggleDark(){
   document.body.classList.toggle("dark");
 }
+
+document.getElementById("amount").addEventListener("input", renderSplit);
 
 updateUI();
 
