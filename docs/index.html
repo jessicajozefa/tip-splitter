@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Budget Split Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      transition: 0.3s;
+      background: #ffffff;
+      color: #111;
+    }
+
+    .dark {
+      background: #111;
+      color: #eee;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .box {
+      flex: 1;
+      min-width: 150px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Budget Split Tracker</h2>
+
+<input id="amount" type="number" placeholder="Enter amount" />
+<button onclick="addEntry()">Add</button>
+<button onclick="toggleDark()">Dark Mode</button>
+
+<div class="card">
+  <h3>Breakdown</h3>
+  <div id="output"></div>
+</div>
+
+<div class="card">
+  <h3>Totals</h3>
+  <div id="totals"></div>
+</div>
+
+<div class="card">
+  <h3>History</h3>
+  <div id="history"></div>
+</div>
+
+<script>
+let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+function addEntry() {
+  let val = parseFloat(document.getElementById("amount").value);
+  if (!val) return;
+
+  let entry = {
+    amount: val,
+    rent: val * 0.30,
+    cc: val * 0.40,
+    taxes: val * 0.12,
+    insurance: val * 0.124,
+    ira: val * 0.056,
+    time: new Date().toLocaleString()
+  };
+
+  history.push(entry);
+  localStorage.setItem("history", JSON.stringify(history));
+
+  updateUI();
+}
+
+function sum(key) {
+  return history.reduce((a, b) => a + (b[key] || 0), 0).toFixed(2);
+}
+
+function updateUI() {
+  let last = history[history.length - 1];
+
+  document.getElementById("output").innerHTML = last ? `
+    <div class="row">
+      <div class="box">Rent: $${last.rent.toFixed(2)}</div>
+      <div class="box">CC: $${last.cc.toFixed(2)}</div>
+      <div class="box">Taxes: $${last.taxes.toFixed(2)}</div>
+      <div class="box">Insurance: $${last.insurance.toFixed(2)}</div>
+      <div class="box">IRA: $${last.ira.toFixed(2)}</div>
+    </div>
+  ` : "";
+
+  document.getElementById("totals").innerHTML = `
+    <p>Total Entered: $${sum("amount")}</p>
+    <p>Total Rent: $${sum("rent")}</p>
+    <p>Total CC: $${sum("cc")}</p>
+    <p>Total Taxes: $${sum("taxes")}</p>
+    <p>Total Insurance: $${sum("insurance")}</p>
+    <p>Total IRA: $${sum("ira")}</p>
+  `;
+
+  document.getElementById("history").innerHTML = history
+    .slice().reverse()
+    .map(h => `<div>$${h.amount} → ${h.time}</div>`)
+    .join("");
+}
+
+function toggleDark() {
+  document.body.classList.toggle("dark");
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
