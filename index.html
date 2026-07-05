@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Tip Flow System - Goal Mode</title>
+<title>Tip Flow System</title>
 
 <style>
 body {
@@ -17,7 +17,7 @@ body {
 
 input {
   font-size: 20px;
-  padding: 10px;
+  padding: 12px;
   width: 90%;
   max-width: 300px;
 }
@@ -26,10 +26,11 @@ button {
   padding: 10px 14px;
   margin: 5px;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .save {
-  font-size: 22px;
+  font-size: 24px;
   background: #2ecc71;
   color: white;
   border: none;
@@ -58,7 +59,7 @@ button {
 
 <body>
 
-<h2>Tip Flow System (Goal Mode)</h2>
+<h2>Tip Flow System</h2>
 
 <button onclick="toggleDark()">Dark Mode</button>
 <button onclick="summary()">Today Summary</button>
@@ -66,9 +67,6 @@ button {
 <br/><br/>
 
 <input id="amount" type="number" placeholder="Enter tip" />
-<br/>
-
-<input id="goal" type="number" placeholder="Savings Goal (e.g. 3000)" />
 <br/>
 
 <button class="save" onclick="addTip()">SAVE TIP</button>
@@ -80,19 +78,30 @@ button {
 </div>
 
 <div class="card">
-<h3>Goal Progress</h3>
-
-<p><b>Goal:</b> $<span id="goalDisplay">0</span></p>
-<p><b>Saved (from tips):</b> $<span id="saved">0</span></p>
-
-<div class="bar"><div id="goalBar" class="fill"></div></div>
-
-<p id="goalStatus"></p>
+<h3>Latest Tip Breakdown</h3>
+<div id="latest"></div>
 </div>
 
 <div class="card">
-<h3>Latest Tip Breakdown</h3>
-<div id="latest"></div>
+<h3>System Totals</h3>
+
+<p><b>Total Tips:</b> $<span id="total"></span></p>
+
+<p><b>Rent (30%):</b> $<span id="rent"></span></p>
+
+<p><b>CC (40%):</b> $<span id="cc"></span> / $2000</p>
+
+<p><b>Taxes (12%):</b> $<span id="tax"></span></p>
+
+<p><b>Insurance (12.4%):</b> $<span id="ins"></span></p>
+
+<p><b>IRA (5.6%):</b> $<span id="ira"></span></p>
+
+<br/>
+
+<div>CC Progress</div>
+<div class="bar"><div id="ccBar" class="fill"></div></div>
+
 </div>
 
 <div class="card">
@@ -105,13 +114,16 @@ button {
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
 function addTip() {
-
   let val = parseFloat(document.getElementById("amount").value);
   if (!val) return;
 
   let entry = {
     amount: val,
+    rent: val * 0.30,
     cc: val * 0.40,
+    tax: val * 0.12,
+    ins: val * 0.124,
+    ira: val * 0.056,
     time: new Date().toLocaleString()
   };
 
@@ -133,28 +145,31 @@ function sum(k){
 
 function update(){
 
-  let goal = parseFloat(document.getElementById("goal").value || 0);
+  let total = sum("amount");
+  let rent = sum("rent");
+  let cc = sum("cc");
+  let tax = sum("tax");
+  let ins = sum("ins");
+  let ira = sum("ira");
 
-  let saved = sum("amount");
+  let ccCap = 2000;
 
-  document.getElementById("goalDisplay").innerText = goal.toFixed(2);
-  document.getElementById("saved").innerText = saved.toFixed(2);
+  document.getElementById("total").innerText = total.toFixed(2);
+  document.getElementById("rent").innerText = rent.toFixed(2);
+  document.getElementById("cc").innerText = cc.toFixed(2);
+  document.getElementById("tax").innerText = tax.toFixed(2);
+  document.getElementById("ins").innerText = ins.toFixed(2);
+  document.getElementById("ira").innerText = ira.toFixed(2);
 
-  let pct = goal ? (saved / goal) * 100 : 0;
-
-  document.getElementById("goalBar").style.width =
-    Math.min(pct, 100) + "%";
-
-  document.getElementById("goalStatus").innerText =
-    goal
-      ? (saved >= goal
-          ? "✅ Goal reached"
-          : "You are " + (goal - saved).toFixed(2) + " away")
-      : "Set a goal to start tracking";
+  document.getElementById("ccBar").style.width =
+    Math.min((cc/ccCap)*100,100) + "%";
 
   document.getElementById("latest").innerHTML =
     tips.length
-      ? `<p>$${tips[tips.length-1].amount}</p>`
+      ? `
+        <p>$${tips[tips.length-1].amount}</p>
+        <p>CC: $${tips[tips.length-1].cc.toFixed(2)}</p>
+      `
       : "";
 
   document.getElementById("history").innerHTML =
@@ -179,12 +194,9 @@ function toggleDark(){
   document.body.classList.toggle("dark");
 }
 
-document.getElementById("goal").addEventListener("input", update);
-
 update();
 
 </script>
 
 </body>
 </html>
-
