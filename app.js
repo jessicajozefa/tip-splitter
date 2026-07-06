@@ -225,3 +225,11 @@ function renderSpainFlow() {
 
   el.innerHTML = html;
 }
+document.querySelectorAll(".category-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".category-chip")
+      .forEach(c => c.classList.remove("active"));
+
+    chip.classList.add("active");
+  });
+});
