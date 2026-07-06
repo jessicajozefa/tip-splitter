@@ -201,3 +201,27 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+function renderSpainFlow() {
+  const el = document.getElementById("spainFlow");
+  if (!el) return;
+
+  const totals = getMonthTotals();
+
+  const spain = totals.spain || 0;
+
+  const html = `
+    <div class="spain-glow"></div>
+
+    <h3 style="margin:0 0 8px 0;">Spain Overflow</h3>
+
+    <div style="font-size:14px; margin-bottom:6px; color:#aaa;">
+      Unallocated: $${spain.toFixed(2)}
+    </div>
+
+    <div style="background:#222838; height:10px; border-radius:999px; overflow:hidden;">
+      <div class="spain-flow-bar" style="width:${Math.min(100, spain)}%"></div>
+    </div>
+  `;
+
+  el.innerHTML = html;
+}
