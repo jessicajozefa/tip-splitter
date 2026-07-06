@@ -52,6 +52,15 @@ function update() {
   `;
 }
 
-document.getElementById("saveBtn").addEventListener("click", addTip);
+function init() {
+  document.getElementById("saveBtn").addEventListener("click", addTip);
+  update();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
 update();
