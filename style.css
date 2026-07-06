@@ -75,7 +75,21 @@ input {
 ========================= */
 
 button {
-  all: unset;
+ button {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  text-transform: none; /* IMPORTANT FIX */
+}
   display: flex;
   justify-content: center;
   align-items: center;
