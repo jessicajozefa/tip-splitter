@@ -168,3 +168,53 @@ if (document.readyState === "loading") {
 } else {
   bindResetButtons();
 }
+function renderProgress() {
+  const totals = getMonthTotals();
+
+  const caps = {
+    insurance: 622,
+    tax: 600,
+    amex: 2000,
+    rent: 1500,
+    ira: 200
+  };
+
+  const labels = {
+    insurance: "Insurance",
+    tax: "Taxes",
+    amex: "Amex",
+    rent: "Rent",
+    ira: "IRA"
+  };
+
+  let html = "";
+
+  for (let key in caps) {
+    const used = totals[key] || 0;
+    const pct = Math.min(100, (used / caps[key]) * 100);
+
+    let color = "black";
+    if (pct > 80) color = "orange";
+    if (pct > 95) color = "red";
+
+    html += `
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between;">
+          <strong>${labels[key]}</strong>
+          <span>$${used.toFixed(2)} / $${caps[key]}</span>
+        </div>
+
+        <div style="background:#eee; height:12px; border-radius:6px; overflow:hidden;">
+          <div style="
+            width:${pct}%;
+            height:12px;
+            background:${color};
+            transition: width 0.4s ease;
+          "></div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById("progress").innerHTML = html;
+}
