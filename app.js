@@ -218,3 +218,4 @@ function renderProgress() {
 
   document.getElementById("progress").innerHTML = html;
 }
+renderProgress();
