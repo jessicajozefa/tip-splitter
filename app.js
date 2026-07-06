@@ -49,7 +49,8 @@ function addTip() {
 
   totals.spain += val * RATES.spain;
 
-  render(val, alloc);
+ render(val, alloc);
+updateDashboard();
 }
 
 function render(val, alloc) {
