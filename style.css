@@ -94,3 +94,35 @@ hr {
   height: 100%;
   transition: width 0.3s ease;
 }
+#spainFlow {
+  background: #151923;
+  border: 1px solid #222838;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  min-height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* flowing animation bar */
+.spain-flow-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  width: 0%;
+  animation: flowIn 0.6s ease forwards;
+}
+
+@keyframes flowIn {
+  from { width: 0%; opacity: 0.2; }
+  to { opacity: 1; }
+}
+
+/* subtle glow effect */
+.spain-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(239,68,68,0.08), transparent 70%);
+  pointer-events: none;
+}
