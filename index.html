@@ -1,4 +1,14 @@
-<link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Tip Splitter</title>
+
+  <!-- CSS MUST BE IN HEAD -->
+  <link rel="stylesheet" href="style.css">
+</head>
 
 <body>
 
@@ -10,6 +20,7 @@
   <div class="input-card">
     <input id="amount" type="number" placeholder="Enter tip" />
 
+    <!-- KEEP ONLY ONE MAIN BUTTON -->
     <button id="saveBtn">SAVE</button>
     <button id="deleteLast">DELETE LAST</button>
   </div>
@@ -25,7 +36,6 @@
 
   <h2>This Month</h2>
 
-  <!-- SINGLE progress container ONLY -->
   <div id="progress"></div>
 
   <div class="controls">
@@ -35,10 +45,12 @@
 
 </div>
 
+<!-- OPTIONAL: sticky action (do NOT duplicate IDs above) -->
+<div class="sticky-action">
+  <button id="stickySaveBtn">ADD TIP</button>
+</div>
+
 <script src="app.js"></script>
 
 </body>
-
-<div class="sticky-action">
-  <button id="saveBtn">ADD TIP</button>
-</div>
+</html>
