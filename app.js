@@ -64,3 +64,19 @@ if (document.readyState === "loading") {
 }
 
 update();
+function bind() {
+  const btn = document.getElementById("saveBtn");
+
+  if (!btn) {
+    console.error("Save button not found");
+    return;
+  }
+
+  btn.onclick = addTip;
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bind);
+} else {
+  bind();
+}
