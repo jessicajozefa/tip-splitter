@@ -281,5 +281,9 @@ hr {
     transform: translateY(0);
   }
 }
+
+  .app > * {
+  margin-bottom: 12px;
+}
   box-sizing: border-box;
 }
