@@ -244,3 +244,22 @@ function renderProgress() {
   document.getElementById("progress").innerHTML = html;
 }
 renderProgress();
+function applyCaps(entry, totals) {
+  const caps = {
+    insurance: 622,
+    tax: 600,
+    amex: 2000,
+    rent: 1500,
+    ira: 200
+  };
+
+  const result = { ...entry };
+
+  for (let key in caps) {
+    const space = caps[key] - totals[key];
+    const used = Math.max(0, Math.min(entry[key], space));
+    result[key] = used;
+  }
+
+  return result;
+}
