@@ -147,6 +147,15 @@ hr {
   animation: flowIn 0.6s ease forwards;
 }
 
+.sticky-action {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(540px, calc(100% - 24px));
+  z-index: 1000;
+}
+
 @keyframes flowIn {
   from {
     width: 0%;
