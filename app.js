@@ -23,14 +23,6 @@ function getMonthTotals() {
     ira: 0,
     spain: 0
   };
-  function deleteLast() {
-  if (tips.length === 0) return;
-
-  tips.pop();
-
-  localStorage.setItem("tips", JSON.stringify(tips));
-  update();
-}
 
   tips.forEach(t => {
     const d = new Date(t.time);
@@ -55,7 +47,6 @@ function addTip() {
   if (isNaN(val)) return;
 
   const totals = getMonthTotals();
-
   let remaining = val;
 
   const entry = {
@@ -69,33 +60,37 @@ function addTip() {
     time: new Date().toISOString()
   };
 
-  /* ---------------- PRIORITY ORDER ----------------
-     Insurance ALWAYS first (your requirement)
-  -------------------------------------------------- */
-
+  // insurance-first priority order
   const order = ["insurance", "tax", "amex", "rent", "ira"];
 
   for (let key of order) {
     const space = CAPS[key] - (totals[key] || 0);
-
     if (space <= 0) continue;
 
     const used = Math.min(space, remaining);
-
     entry[key] = used;
     remaining -= used;
 
     if (remaining <= 0) break;
   }
 
-  /* ---------------- SPAIN OVERFLOW ---------------- */
-
+  // overflow → Spain
   entry.spain = remaining;
 
   tips.push(entry);
   localStorage.setItem("tips", JSON.stringify(tips));
 
   input.value = "";
+  update();
+}
+
+/* ---------------- DELETE LAST ---------------- */
+
+function deleteLast() {
+  if (tips.length === 0) return;
+
+  tips.pop();
+  localStorage.setItem("tips", JSON.stringify(tips));
   update();
 }
 
@@ -131,7 +126,7 @@ function update() {
   renderProgress();
 }
 
-/* ---------------- PROGRESS BARS ---------------- */
+/* ---------------- PROGRESS ---------------- */
 
 function renderProgress() {
   const totals = getMonthTotals();
@@ -168,38 +163,33 @@ function renderProgress() {
 /* ---------------- RESET ---------------- */
 
 function bindReset() {
-  const monthBtn = document.getElementById("resetMonth");
-  const allBtn = document.getElementById("resetAll");
+  document.getElementById("resetMonth").onclick = () => {
+    const now = new Date();
+    const m = now.getMonth();
+    const y = now.getFullYear();
 
-  if (monthBtn) {
-    monthBtn.onclick = () => {
-      const now = new Date();
-      const m = now.getMonth();
-      const y = now.getFullYear();
+    tips = tips.filter(t => {
+      const d = new Date(t.time);
+      return !(d.getMonth() === m && d.getFullYear() === y);
+    });
 
-      tips = tips.filter(t => {
-        const d = new Date(t.time);
-        return !(d.getMonth() === m && d.getFullYear() === y);
-      });
+    localStorage.setItem("tips", JSON.stringify(tips));
+    update();
+  };
 
-      localStorage.setItem("tips", JSON.stringify(tips));
-      update();
-    };
-  }
-
-  if (allBtn) {
-    allBtn.onclick = () => {
-      tips = [];
-      localStorage.removeItem("tips");
-      update();
-    };
-  }
+  document.getElementById("resetAll").onclick = () => {
+    tips = [];
+    localStorage.removeItem("tips");
+    update();
+  };
 }
 
 /* ---------------- INIT ---------------- */
 
-function init(document.getElementById("deleteLast").onclick = deleteLast;) {
+function init() {
   document.getElementById("saveBtn").onclick = addTip;
+  document.getElementById("deleteLast").onclick = deleteLast;
+
   bindReset();
   update();
 }
