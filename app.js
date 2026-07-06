@@ -134,3 +134,37 @@ document.getElementById("resetAll").onclick = () => {
   localStorage.removeItem("tips");
   update();
 };
+function bindResetButtons() {
+  const monthBtn = document.getElementById("resetMonth");
+  const allBtn = document.getElementById("resetAll");
+
+  if (monthBtn) {
+    monthBtn.addEventListener("click", () => {
+      const now = new Date();
+      const m = now.getMonth();
+      const y = now.getFullYear();
+
+      tips = tips.filter(t => {
+        const d = new Date(t.time);
+        return !(d.getMonth() === m && d.getFullYear() === y);
+      });
+
+      localStorage.setItem("tips", JSON.stringify(tips));
+      update();
+    });
+  }
+
+  if (allBtn) {
+    allBtn.addEventListener("click", () => {
+      tips = [];
+      localStorage.removeItem("tips");
+      update();
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bindResetButtons);
+} else {
+  bindResetButtons();
+}
