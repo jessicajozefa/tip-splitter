@@ -1,3 +1,10 @@
+const CAPS = {
+  insurance: 622,
+  tax: 600,
+  amex: 2000,
+  rent: 1500,
+  ira: 200
+};
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
 function addTip() {
