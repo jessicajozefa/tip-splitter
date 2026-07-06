@@ -6,6 +6,8 @@ const CAPS = {
   ira: 200
 };
 
+document.getElementById("stickySaveBtn")
+
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
 /* ---------------- MONTH TOTALS ---------------- */
