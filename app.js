@@ -23,6 +23,14 @@ function getMonthTotals() {
     ira: 0,
     spain: 0
   };
+  function deleteLast() {
+  if (tips.length === 0) return;
+
+  tips.pop();
+
+  localStorage.setItem("tips", JSON.stringify(tips));
+  update();
+}
 
   tips.forEach(t => {
     const d = new Date(t.time);
