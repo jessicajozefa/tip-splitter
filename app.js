@@ -8,7 +8,7 @@ const CAPS = {
 
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
-/* ---------------- CORE ---------------- */
+/* ---------------- MONTH TOTALS ---------------- */
 
 function getMonthTotals() {
   const now = new Date();
@@ -48,31 +48,40 @@ function addTip() {
 
   const totals = getMonthTotals();
 
-  // STEP 1: percentage split
-  let entry = {
+  let remaining = val;
+
+  const entry = {
     amount: val,
-    insurance: val * 0.12,
-    tax: val * 0.12,
-    amex: val * 0.40,
-    rent: val * 0.30,
-    ira: val * 0.04,
+    insurance: 0,
+    tax: 0,
+    amex: 0,
+    rent: 0,
+    ira: 0,
     spain: 0,
     time: new Date().toISOString()
   };
 
-  // STEP 2: apply caps + collect overflow
-  let remaining = 0;
+  /* ---------------- PRIORITY ORDER ----------------
+     Insurance ALWAYS first (your requirement)
+  -------------------------------------------------- */
 
-  for (let key of ["insurance", "tax", "amex", "rent", "ira"]) {
+  const order = ["insurance", "tax", "amex", "rent", "ira"];
+
+  for (let key of order) {
     const space = CAPS[key] - (totals[key] || 0);
 
-    if (entry[key] > space) {
-      remaining += entry[key] - Math.max(0, space);
-      entry[key] = Math.max(0, space);
-    }
+    if (space <= 0) continue;
+
+    const used = Math.min(space, remaining);
+
+    entry[key] = used;
+    remaining -= used;
+
+    if (remaining <= 0) break;
   }
 
-  // STEP 3: overflow → Spain
+  /* ---------------- SPAIN OVERFLOW ---------------- */
+
   entry.spain = remaining;
 
   tips.push(entry);
@@ -114,7 +123,7 @@ function update() {
   renderProgress();
 }
 
-/* ---------------- PROGRESS ---------------- */
+/* ---------------- PROGRESS BARS ---------------- */
 
 function renderProgress() {
   const totals = getMonthTotals();
@@ -139,7 +148,6 @@ function renderProgress() {
     `;
   }
 
-  // Spain
   html += `
     <div style="margin-top:16px;">
       <strong>Spain Fund</strong> $${(totals.spain || 0).toFixed(2)}
@@ -152,25 +160,32 @@ function renderProgress() {
 /* ---------------- RESET ---------------- */
 
 function bindReset() {
-  document.getElementById("resetMonth").onclick = () => {
-    const now = new Date();
-    const m = now.getMonth();
-    const y = now.getFullYear();
+  const monthBtn = document.getElementById("resetMonth");
+  const allBtn = document.getElementById("resetAll");
 
-    tips = tips.filter(t => {
-      const d = new Date(t.time);
-      return !(d.getMonth() === m && d.getFullYear() === y);
-    });
+  if (monthBtn) {
+    monthBtn.onclick = () => {
+      const now = new Date();
+      const m = now.getMonth();
+      const y = now.getFullYear();
 
-    localStorage.setItem("tips", JSON.stringify(tips));
-    update();
-  };
+      tips = tips.filter(t => {
+        const d = new Date(t.time);
+        return !(d.getMonth() === m && d.getFullYear() === y);
+      });
 
-  document.getElementById("resetAll").onclick = () => {
-    tips = [];
-    localStorage.removeItem("tips");
-    update();
-  };
+      localStorage.setItem("tips", JSON.stringify(tips));
+      update();
+    };
+  }
+
+  if (allBtn) {
+    allBtn.onclick = () => {
+      tips = [];
+      localStorage.removeItem("tips");
+      update();
+    };
+  }
 }
 
 /* ---------------- INIT ---------------- */
