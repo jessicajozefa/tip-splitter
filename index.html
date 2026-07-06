@@ -1,206 +1,21 @@
-<!-- FORCE DEPLOY 2026-TEST -->
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8" />
-<title>Tip Flow System</title>
+ <p class="tagline">Money with a purpose. Every dollar has a home.</p>
 
-<style>
-body {
-  font-family: Arial;
-  margin: 0;
-  padding: 20px;
-  background: #fff;
-  color: #111;
-}
+  <div class="card">
 
-.dark { background:#111; color:#eee; }
+    <h2>Tonight's Tips</h2>
 
-input {
-  font-size: 20px;
-  padding: 12px;
-  width: 90%;
-  max-width: 300px;
-}
+    <input id="amount" type="number" placeholder="$0.00" />
 
-button {
-  padding: 10px 14px;
-  margin: 5px;
-  border-radius: 8px;
-  cursor: pointer;
-}
+    <button onclick="addTip()">SAVE</button>
 
-.save {
-  font-size: 24px;
-  background: #2ecc71;
-  color: white;
-  border: none;
-}
+    <div id="result"></div>
 
-.card {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
-}
-</style>
-</head>
+  </div>
 
-<body>
+  <div class="card">
+    <h2>This Month</h2>
 
-<h2>Tip Flow System</h2>
+    <div id="dashboard"></div>
+  </div>
 
-<button onclick="toggleDark()">Dark Mode</button>
-
-<br/><br/>
-
-<input id="amount" type="number" placeholder="Enter tip" />
-<br/>
-
-<button class="save" onclick="addTip()">SAVE TIP</button>
-
-<br/>
-
-<button onclick="quick(20)">$20</button>
-<button onclick="quick(50)">$50</button>
-<button onclick="quick(100)">$100</button>
-
-<br/><br/>
-
-<!-- CONTROL BUTTONS -->
-<button onclick="clearAll()" style="background:#e74c3c;color:white;">Clear All</button>
-<button onclick="undoLast()" style="background:#f39c12;color:white;">Undo Last</button>
-<button onclick="resetToday()" style="background:#3498db;color:white;">Reset Today</button>
-<button onclick="resetMonth()" style="background:#9b59b6;color:white;">Reset Month</button>
-
-<div class="card">
-<h3>Latest Tip</h3>
-<div id="latest"></div>
 </div>
-
-<div class="card">
-<h3>Totals</h3>
-<div id="totals"></div>
-</div>
-
-<div class="card">
-<h3>History</h3>
-<div id="history"></div>
-</div>
-
-<script>
-
-let tips = JSON.parse(localStorage.getItem("tips") || "[]");
-
-function save() {
-  localStorage.setItem("tips", JSON.stringify(tips));
-}
-
-function addTip() {
-  let val = parseFloat(document.getElementById("amount").value);
-  if (!val) return;
-
-  tips.push({
-    amount: val,
-    cc: val * 0.40,
-    rent: val * 0.30,
-    tax: val * 0.12,
-    ins: val * 0.124,
-    ira: val * 0.056,
-    time: new Date().toLocaleString()
-  });
-
-  save();
-  document.getElementById("amount").value = "";
-  update();
-}
-
-function quick(v){
-  document.getElementById("amount").value = v;
-  addTip();
-}
-
-function sum(k){
-  return tips.reduce((a,b)=>a+(b[k]||0),0);
-}
-
-function update(){
-
-  let total = sum("amount");
-  let cc = sum("cc");
-  let rent = sum("rent");
-  let tax = sum("tax");
-  let ins = sum("ins");
-  let ira = sum("ira");
-
-  let ccCap = 2000;
-
-  document.getElementById("latest").innerHTML =
-    tips.length
-      ? `<p>$${tips[tips.length-1].amount} (CC: $${tips[tips.length-1].cc.toFixed(2)})</p>`
-      : "";
-
-  document.getElementById("totals").innerHTML = `
-    <p><b>Total Tips:</b> $${total.toFixed(2)}</p>
-    <p><b>CC:</b> $${cc.toFixed(2)} / $${ccCap}</p>
-    <p><b>Rent:</b> $${rent.toFixed(2)}</p>
-    <p><b>Taxes:</b> $${tax.toFixed(2)}</p>
-    <p><b>Insurance:</b> $${ins.toFixed(2)}</p>
-    <p><b>IRA:</b> $${ira.toFixed(2)}</p>
-  `;
-
-  document.getElementById("history").innerHTML =
-    tips.slice().reverse()
-    .map(t => `$${t.amount} — ${t.time}`)
-    .join("<br>");
-}
-
-/* =======================
-   CONTROL FUNCTIONS
-======================= */
-
-function clearAll(){
-  if(!confirm("Clear ALL data?")) return;
-  tips = [];
-  save();
-  update();
-}
-
-function undoLast(){
-  if(!tips.length) return;
-  tips.pop();
-  save();
-  update();
-}
-
-function resetToday(){
-  let today = new Date().toDateString();
-  tips = tips.filter(t => new Date(t.time).toDateString() !== today);
-  save();
-  update();
-}
-
-function resetMonth(){
-  let now = new Date();
-  let m = now.getMonth();
-  let y = now.getFullYear();
-
-  tips = tips.filter(t => {
-    let d = new Date(t.time);
-    return !(d.getMonth() === m && d.getFullYear() === y);
-  });
-
-  save();
-  update();
-}
-
-function toggleDark(){
-  document.body.classList.toggle("dark");
-}
-
-update();
-
-</script>
-
-</body>
-</html>
