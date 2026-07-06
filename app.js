@@ -1,80 +1,17 @@
-const CAPS = {
-  insurance: 622,
-  tax: 600,
-  amex: 2000,
-  rent: 1500,
-  ira: 200
-};
+JOZEFA INSPIRADA
+Money with a purpose. Every dollar has a home.
 
-const RATES = {
-  insurance: 0.1215,
-  tax: 0.12,
-  amex: 0.40,
-  rent: 0.30,
-  ira: 0.0391,
-  spain: 0.0194
-};
+261.00
+ SAVE
+Saved: $261.00
+Insurance: $31.71
 
-let totals = {
-  insurance: 0,
-  tax: 0,
-  amex: 0,
-  rent: 0,
-  ira: 0,
-  spain: 0
-};
+Taxes: $31.32
 
-function addTip() {
-  const val = parseFloat(document.getElementById("amount").value);
-  if (!val) return;
+Amex Payment: $104.40
 
-  let alloc = {};
+Rent: $78.30
 
-  for (let k of ["insurance","tax","amex","rent","ira"]) {
-    let add = val * RATES[k];
+IRA: $10.21
 
-    if (totals[k] >= CAPS[k]) {
-      totals.spain += add;
-      alloc[k] = 0;
-    } else if (totals[k] + add > CAPS[k]) {
-      let remaining = CAPS[k] - totals[k];
-      totals[k] += remaining;
-      totals.spain += (add - remaining);
-      alloc[k] = remaining;
-    } else {
-      totals[k] += add;
-      alloc[k] = add;
-    }
-  }
-
-  totals.spain += val * RATES.spain;
-
- render(val, alloc);
-updateDashboard();
-}
-
-function render(val, alloc) {
-  document.getElementById("result").innerHTML = `
-    <h3>Saved: $${val.toFixed(2)}</h3>
-
-    <p>Insurance: $${alloc.insurance.toFixed(2)}</p>
-    <p>Taxes: $${alloc.tax.toFixed(2)}</p>
-    <p>Amex: $${alloc.amex.toFixed(2)}</p>
-    <p>Rent: $${alloc.rent.toFixed(2)}</p>
-    <p>IRA: $${alloc.ira.toFixed(2)}</p>
-
-    <hr>
-    <p>🇪🇸 Spain Fund: $${totals.spain.toFixed(2)}</p>
-    function updateDashboard() {
-  document.getElementById("dashboard").innerHTML = `
-    🩺 Insurance: $${totals.insurance.toFixed(2)} / 622<br>
-    🧾 Taxes: $${totals.tax.toFixed(2)} / 600<br>
-    💳 Amex: $${totals.amex.toFixed(2)} / 2000<br>
-    🏠 Rent: $${totals.rent.toFixed(2)} / 1500<br>
-    🏦 IRA: $${totals.ira.toFixed(2)} / 200<br>
-    <br>
-    🇪🇸 Spain Fund: $${totals.spain.toFixed(2)}
-  `;
-}
-  `;
-}
+Spain Fund: $5.06
