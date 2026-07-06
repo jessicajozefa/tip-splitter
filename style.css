@@ -1,13 +1,133 @@
+/* =========================
+   BASE / THEME
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   font-weight: 700;
-  background: #121417; /* dark charcoal (not pure black) */
+  background: #121417; /* dark charcoal */
   color: #f2f2f2;
   margin: 0;
   padding: 20px;
   font-size: 20px;
   line-height: 1.4;
 }
+
+.app {
+  max-width: 540px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+p {
+  color: #b5b5b5;
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+
+small {
+  color: #9aa4b2;
+  font-size: 16px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #2a2f3a;
+  background: #1b1f24;
+  color: #fff;
+  font-size: 34px; /* big amount field */
+  font-weight: 800;
+  text-align: center;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  min-height: 56px;
+}
+
+/* Primary ADD TIP */
+#saveBtn {
+  background: #1ed760;
+  color: #000;
+}
+
+#saveBtn:hover {
+  background: #17c653;
+}
+
+/* Delete */
+#deleteLast {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Secondary controls */
+.controls button {
+  background: #1b1f24;
+  color: #eaeaea;
+  margin-right: 8px;
+  margin-top: 10px;
+  border: 1px solid #2a2f3a;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.summary,
+#progress,
+#result,
+#spainFlow {
+  background: #1b1f24;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #2a2f3a;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* =========================
+   CATEGORY CHIPS (NEW UX)
+========================= */
 
 .category-container {
   display: flex;
@@ -23,7 +143,6 @@ body {
   border: 1px solid #2a2f3a;
   font-size: 20px;
   cursor: pointer;
-  user-select: none;
   min-height: 48px;
   display: flex;
   align-items: center;
@@ -35,19 +154,17 @@ body {
   color: #000;
   border-color: transparent;
 }
-Why this matters:
-faster scanning
-no “list fatigue”
-feels like modern fintech apps (Venmo/Cash App style)
-3) Animated transaction entries (big UX upgrade)
-CSS
+
+/* =========================
+   TRANSACTIONS (ANIMATION)
+========================= */
+
 .transaction {
   background: #1b1f24;
   border: 1px solid #2a2f3a;
   padding: 14px;
   border-radius: 14px;
   margin-bottom: 10px;
-
   animation: popIn 0.25s ease-out;
 }
 
@@ -61,147 +178,11 @@ CSS
     transform: translateY(0);
   }
 }
-4) Optional but HIGHLY recommended polish (tiny change, big effect)
-Make EVERYTHING more consistent spacing-wise:
-.app > * {
-  margin-bottom: 12px;
-}
-5) Tiny JS upgrade (for chip selection behavior)
 
-If your categories are clickable, use this pattern:
+/* =========================
+   PROGRESS BARS
+========================= */
 
-document.querySelectorAll(".category-chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".category-chip")
-      .forEach(c => c.classList.remove("active"));
-
-    chip.classList.add("active");
-  });
-});
-What your app will feel like after this
-Sticky primary action → “always ready”
-Chips → “fast mental scanning”
-Animations → “alive system”
-Dark charcoal + bold Arial → “fintech utility vibe”
-
-If you want the next step after this, I’d strongly recommend one of these:
-
-auto-split calculator (instant per-person breakdown)
-undo toast (swipe or 3-second undo after adding tip)
-haptic-style press feedback (tiny scale animation)
-receipt-style grouped history (daily collapsible sections)
-
-Just tell me 👍
-
-/* App container */
-.app {
-  max-width: 540px;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Headings */
-h1 {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 6px;
-  letter-spacing: 0.5px;
-}
-
-p {
-  color: #b5b5b5;
-  margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 20px;
-}
-
-/* INPUT AREA */
-.input-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Big amount input */
-input {
-  width: 100%;
-  padding: 18px;
-  border-radius: 14px;
-  border: 1px solid #2a2f3a;
-  background: #1b1f24;
-  color: #fff;
-  font-size: 34px; /* extra large amount field */
-  font-weight: 800;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-/* Buttons */
-button {
-  font-family: Arial, sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  padding: 16px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  min-height: 56px; /* large touch targets */
-}
-
-/* Primary ADD TIP button */
-#saveBtn {
-  background: #1ed760;
-  color: #000;
-}
-
-#saveBtn:hover {
-  background: #17c653;
-}
-
-/* Secondary delete button */
-#deleteLast {
-  background: #ef4444;
-  color: #fff;
-}
-
-/* Other controls */
-.controls button {
-  background: #1b1f24;
-  color: #eaeaea;
-  margin-right: 8px;
-  margin-top: 10px;
-  border: 1px solid #2a2f3a;
-}
-
-/* Cards (summary, progress, result, etc.) */
-.summary,
-#progress,
-#result,
-#spainFlow {
-  background: #1b1f24;
-  padding: 16px;
-  border-radius: 16px;
-  margin-bottom: 14px;
-  border: 1px solid #2a2f3a;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-}
-
-/* Small text */
-small {
-  color: #9aa4b2;
-  font-size: 16px;
-}
-
-/* Divider */
-hr {
-  border: none;
-  border-top: 1px solid #2a2f3a;
-  margin: 16px 0;
-}
-
-/* Progress bars */
 .progress-bar {
   background: #2a2f3a;
   height: 12px;
@@ -215,29 +196,23 @@ hr {
   transition: width 0.3s ease;
 }
 
-/* Spain flow section */
+/* =========================
+   SPAIN FLOW
+========================= */
+
 #spainFlow {
   min-height: 90px;
   position: relative;
   overflow: hidden;
+  margin-bottom: 14px;
 }
 
-/* flowing animation bar */
 .spain-flow-bar {
   height: 12px;
   border-radius: 999px;
   background: linear-gradient(90deg, #f59e0b, #ef4444);
   width: 0%;
   animation: flowIn 0.6s ease forwards;
-}
-
-.sticky-action {
-  position: fixed;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(540px, calc(100% - 24px));
-  z-index: 1000;
 }
 
 @keyframes flowIn {
@@ -250,7 +225,6 @@ hr {
   }
 }
 
-/* subtle glow effect */
 .spain-glow {
   position: absolute;
   inset: 0;
@@ -258,32 +232,33 @@ hr {
   pointer-events: none;
 }
 
-/* Ensure better spacing everywhere */
-* {
+/* =========================
+   DIVIDERS
+========================= */
 
-  .transaction {
-  background: #1b1f24;
-  border: 1px solid #2a2f3a;
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 10px;
-
-  animation: popIn 0.25s ease-out;
+hr {
+  border: none;
+  border-top: 1px solid #2a2f3a;
+  margin: 16px 0;
 }
 
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* =========================
+   SPACING SYSTEM
+========================= */
 
-  .app > * {
+.app > * {
   margin-bottom: 12px;
 }
-  box-sizing: border-box;
+
+/* =========================
+   OPTIONAL: STICKY ACTION BAR
+========================= */
+
+.sticky-action {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(540px, calc(100% - 24px));
+  z-index: 1000;
 }
