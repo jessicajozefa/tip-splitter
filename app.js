@@ -22,8 +22,16 @@ function addTip() {
 
   if (!val) return;
 
-  const entry = allocate(val);
-  tips.push(entry);
+  tips.push({
+    amount: val,
+    time: new Date().toISOString(),
+    insurance: 0,
+    tax: 0,
+    amex: 0,
+    rent: 0,
+    ira: 0,
+    spain: 0
+  });
 
   localStorage.setItem("tips", JSON.stringify(tips));
 
