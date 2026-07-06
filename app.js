@@ -39,13 +39,14 @@ function getMonthTotals() {
   return totals;
 }
 
-/* ---------------- ADD TIP ---------------- */
+/* ---------------- ADD TIP (CORE ENGINE) ---------------- */
 
 function addTip() {
   const input = document.getElementById("amount");
   const val = parseFloat(input.value);
   if (isNaN(val)) return;
 
+  // STEP 1: pure percentage split
   let entry = {
     amount: val,
     insurance: val * 0.12,
@@ -57,44 +58,23 @@ function addTip() {
     time: new Date().toISOString()
   };
 
+  // STEP 2: apply caps AFTER split
   const totals = getMonthTotals();
   let overflow = 0;
 
-  // APPLY CAPS AFTER SPLIT (IMPORTANT CHANGE)
-  for (let key of ["insurance", "tax", "amex", "rent", "ira"]) {
-    const capSpace = CAPS[key] - (totals[key] || 0);
-
-    if (entry[key] > capSpace) {
-      overflow += entry[key] - Math.max(0, capSpace);
-      entry[key] = Math.max(0, capSpace);
-    }
-  }
-
-  entry.spain = overflow;
-
-  tips.push(entry);
-  localStorage.setItem("tips", JSON.stringify(tips));
-
-  input.value = "";
-  update();
-}
-
-  // insurance-first priority order
   const order = ["insurance", "tax", "amex", "rent", "ira"];
 
   for (let key of order) {
-    const space = CAPS[key] - (totals[key] || 0);
-    if (space <= 0) continue;
+    const capRemaining = CAPS[key] - (totals[key] || 0);
 
-    const used = Math.min(space, remaining);
-    entry[key] = used;
-    remaining -= used;
-
-    if (remaining <= 0) break;
+    if (entry[key] > capRemaining) {
+      overflow += entry[key] - Math.max(0, capRemaining);
+      entry[key] = Math.max(0, capRemaining);
+    }
   }
 
-  // overflow → Spain
-  entry.spain = remaining;
+  // STEP 3: overflow → Spain
+  entry.spain = overflow;
 
   tips.push(entry);
   localStorage.setItem("tips", JSON.stringify(tips));
@@ -182,25 +162,32 @@ function renderProgress() {
 /* ---------------- RESET ---------------- */
 
 function bindReset() {
-  document.getElementById("resetMonth").onclick = () => {
-    const now = new Date();
-    const m = now.getMonth();
-    const y = now.getFullYear();
+  const monthBtn = document.getElementById("resetMonth");
+  const allBtn = document.getElementById("resetAll");
 
-    tips = tips.filter(t => {
-      const d = new Date(t.time);
-      return !(d.getMonth() === m && d.getFullYear() === y);
-    });
+  if (monthBtn) {
+    monthBtn.onclick = () => {
+      const now = new Date();
+      const m = now.getMonth();
+      const y = now.getFullYear();
 
-    localStorage.setItem("tips", JSON.stringify(tips));
-    update();
-  };
+      tips = tips.filter(t => {
+        const d = new Date(t.time);
+        return !(d.getMonth() === m && d.getFullYear() === y);
+      });
 
-  document.getElementById("resetAll").onclick = () => {
-    tips = [];
-    localStorage.removeItem("tips");
-    update();
-  };
+      localStorage.setItem("tips", JSON.stringify(tips));
+      update();
+    };
+  }
+
+  if (allBtn) {
+    allBtn.onclick = () => {
+      tips = [];
+      localStorage.removeItem("tips");
+      update();
+    };
+  }
 }
 
 /* ---------------- INIT ---------------- */
