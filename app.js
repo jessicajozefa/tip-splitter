@@ -28,7 +28,23 @@ function addTip() {
 
   document.getElementById("amount").value = "";
 
-  update();
+  function update() {
+  const month = getMonthTotals();
+
+  let list = tips.map(t => `
+    <div>
+      <b>$${t.amount.toFixed(2)}</b>
+      (Spain: $${t.spain.toFixed(2)})
+    </div>
+  `).join("");
+
+  document.getElementById("result").innerHTML = `
+    <h3>Transaction History</h3>
+    ${list}
+  `;
+
+  console.log("TIPS ARRAY:", tips);
+}
 }
 
 function allocate(amount) {
