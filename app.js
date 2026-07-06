@@ -46,19 +46,38 @@ function addTip() {
   const val = parseFloat(input.value);
   if (isNaN(val)) return;
 
-  const totals = getMonthTotals();
-  let remaining = val;
-
-  const entry = {
+  let entry = {
     amount: val,
-    insurance: 0,
-    tax: 0,
-    amex: 0,
-    rent: 0,
-    ira: 0,
+    insurance: val * 0.12,
+    tax: val * 0.12,
+    amex: val * 0.40,
+    rent: val * 0.30,
+    ira: val * 0.04,
     spain: 0,
     time: new Date().toISOString()
   };
+
+  const totals = getMonthTotals();
+  let overflow = 0;
+
+  // APPLY CAPS AFTER SPLIT (IMPORTANT CHANGE)
+  for (let key of ["insurance", "tax", "amex", "rent", "ira"]) {
+    const capSpace = CAPS[key] - (totals[key] || 0);
+
+    if (entry[key] > capSpace) {
+      overflow += entry[key] - Math.max(0, capSpace);
+      entry[key] = Math.max(0, capSpace);
+    }
+  }
+
+  entry.spain = overflow;
+
+  tips.push(entry);
+  localStorage.setItem("tips", JSON.stringify(tips));
+
+  input.value = "";
+  update();
+}
 
   // insurance-first priority order
   const order = ["insurance", "tax", "amex", "rent", "ira"];
