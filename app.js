@@ -39,7 +39,7 @@ function addTip() {
     rent: "Rent",
     ira: "IRA"
   };
-
+renderProgress();
   let html = "";
 
   for (let key in bars) {
