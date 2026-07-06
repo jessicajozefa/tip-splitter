@@ -198,7 +198,7 @@ function bindReset() {
 
 /* ---------------- INIT ---------------- */
 
-function init() {
+function init(document.getElementById("deleteLast").onclick = deleteLast;) {
   document.getElementById("saveBtn").onclick = addTip;
   bindReset();
   update();
