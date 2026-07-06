@@ -20,6 +20,30 @@ function getMonthTotals() {
     tax: 0,
     amex: 0,
     rent: 0,
+    ira: 0,
+    spain: 0
+  };
+
+  tips.forEach(t => {
+    const d = new Date(t.time);
+    if (d.getMonth() === m && d.getFullYear() === y) {
+      totals.insurance += t.insurance;
+      totals.tax += t.tax;
+      totals.amex += t.amex;
+      totals.rent += t.rent;
+      totals.ira += t.ira;
+      totals.spain += t.spain || 0;
+    }
+  });
+
+  return totals;
+}
+
+  let totals = {
+    insurance: 0,
+    tax: 0,
+    amex: 0,
+    rent: 0,
     ira: 0
   };
 
