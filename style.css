@@ -1,32 +1,22 @@
 /* =========================
-   RESET
-========================= */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* =========================
-   BASE THEME (CREAM)
+   BASE (APPLE WALLET STYLE)
 ========================= */
 
 body {
-  font-family: Arial, sans-serif !important;
-  background: #f6f3ee !important; /* soft cream */
-  color: #1b1b1b !important;
-  font-size: 20px;
-  line-height: 1.4;
+  font-family: Arial, sans-serif;
+  background: #f6f3ee;
+  color: #1b1b1b;
+  margin: 0;
   padding: 20px;
+  font-size: 20px;
 }
 
 /* =========================
-   APP LAYOUT
+   CONTAINER
 ========================= */
 
 .app {
-  max-width: 540px;
+  max-width: 520px;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -34,26 +24,22 @@ body {
 }
 
 /* =========================
-   TYPOGRAPHY
+   HEADER FEEL (CLEAN + LIGHT)
 ========================= */
 
 h1 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
-}
-
-h2 {
-  font-size: 22px;
-  font-weight: 800;
+  margin-bottom: 4px;
 }
 
 p {
-  color: #4a4a4a;
-  font-size: 20px;
+  color: #5a5a5a;
+  margin-bottom: 10px;
 }
 
 /* =========================
-   INPUT (FIXED FOR LIGHT THEME)
+   INPUT (APPLE CARD STYLE)
 ========================= */
 
 input {
@@ -63,15 +49,17 @@ input {
   font-weight: 800;
   text-align: center;
 
-  border-radius: 14px;
-  border: 1px solid #d8d0c3;
+  border-radius: 18px;
+  border: 1px solid #e3ddd2;
 
   background: #ffffff;
   color: #1b1b1b;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
 /* =========================
-   BUTTON RESET
+   BUTTONS (NO FLOATING)
 ========================= */
 
 button {
@@ -80,51 +68,31 @@ button {
   justify-content: center;
   align-items: center;
 
-  font-family: Arial, sans-serif;
   font-weight: 800;
   font-size: 22px;
 
   padding: 16px;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
 
   min-height: 56px;
-  text-align: center;
 }
 
-/* =========================
-   PRIMARY BUTTON
-========================= */
-
-#saveBtn,
-#stickySaveBtn {
-  background: #1ed760;
-  color: #000;
+/* PRIMARY ACTION (APPLE GREEN) */
+#saveBtn {
+  background: #34c759;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(52,199,89,0.25);
 }
 
-/* =========================
-   DELETE BUTTON
-========================= */
-
+/* DELETE */
 #deleteLast {
-  background: #ef4444;
+  background: #ff3b30;
   color: #fff;
 }
 
 /* =========================
-   SECONDARY BUTTONS
-========================= */
-
-.controls button {
-  background: #ffffff;
-  color: #1b1b1b;
-  border: 1px solid #d8d0c3;
-  margin-right: 8px;
-  margin-top: 10px;
-}
-
-/* =========================
-   CARDS (LIGHT MODE FIXED)
+   CARDS (APPLE WALLET STYLE)
 ========================= */
 
 .summary,
@@ -133,11 +101,14 @@ button {
 #spainFlow,
 .transaction {
   background: #ffffff;
-  border: 1px solid #e6e0d6;
-  padding: 16px;
-  border-radius: 16px;
+  border: 1px solid #e9e2d8;
+  border-radius: 20px;
 
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  padding: 16px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.06),
+    0 2px 6px rgba(0,0,0,0.04);
 }
 
 /* =========================
@@ -149,25 +120,24 @@ button {
 }
 
 /* =========================
-   DIVIDER
+   DIVIDER (SOFT)
 ========================= */
 
 hr {
   border: none;
-  border-top: 1px solid #e6e0d6;
+  border-top: 1px solid #ece5db;
   margin: 16px 0;
 }
 
 /* =========================
-   PROGRESS BAR
+   PROGRESS BAR (SUBTLE)
 ========================= */
 
 .progress-bar {
-  background: #e6e0d6;
-  height: 12px;
+  background: #eee6dc;
+  height: 10px;
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 8px;
 }
 
 .progress-fill {
@@ -176,7 +146,7 @@ hr {
 }
 
 /* =========================
-   SPAIN FLOW
+   SPAIN FLOW (SOFT ACCENT)
 ========================= */
 
 #spainFlow {
@@ -186,39 +156,33 @@ hr {
 }
 
 .spain-flow-bar {
-  height: 12px;
+  height: 10px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  background: linear-gradient(90deg, #ff9f0a, #ff3b30);
   width: 0%;
   animation: flowIn 0.6s ease forwards;
 }
 
 @keyframes flowIn {
-  from {
-    width: 0%;
-    opacity: 0.2;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.spain-glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(239,68,68,0.08), transparent 70%);
-  pointer-events: none;
+  from { width: 0%; opacity: 0.3; }
+  to { opacity: 1; }
 }
 
 /* =========================
-   STICKY BUTTON
+   TRANSACTION ANIMATION
 ========================= */
 
-.sticky-action {
-  position: fixed;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(540px, calc(100% - 24px));
-  z-index: 1000;
+.transaction {
+  animation: popIn 0.25s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
