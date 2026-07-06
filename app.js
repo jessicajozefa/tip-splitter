@@ -29,6 +29,34 @@ function addTip() {
 
   input.value = "";
   update();
+  function renderProgress() {
+  const totals = getMonthTotals();
+
+  const bars = {
+    insurance: "Insurance",
+    tax: "Taxes",
+    amex: "Amex",
+    rent: "Rent",
+    ira: "IRA"
+  };
+
+  let html = "";
+
+  for (let key in bars) {
+    let pct = Math.min(100, (totals[key] / CAPS[key]) * 100);
+
+    html += `
+      <div style="margin-bottom:10px;">
+        <div>${bars[key]} - $${totals[key].toFixed(2)} / $${CAPS[key]}</div>
+        <div style="background:#eee; height:10px; border-radius:5px;">
+          <div style="width:${pct}%; height:10px; background:black; border-radius:5px;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById("progress").innerHTML = html;
+}
 }
 
 function update() {
