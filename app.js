@@ -35,7 +35,7 @@ function addTip() {
 
   localStorage.setItem("tips", JSON.stringify(tips));
 
-  document.getElementById("amount").value = "";
+  document.getElementById("saveBtn").addEventListener("click", addTip);
 
   update();
 }
