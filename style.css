@@ -1,37 +1,29 @@
+/* =========================
+   HARD RESET (IMPORTANT)
+========================= */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* =========================
+   BASE THEME
+========================= */
+
 body {
   font-family: Arial, sans-serif !important;
-  background: #121417 !important;
+  background: #121417 !important; /* charcoal */
   color: #f2f2f2 !important;
   font-size: 20px;
-}
-body {
-  background: hotpink !important;
+  line-height: 1.4;
+  padding: 20px;
 }
 
 /* =========================
-   BASE / THEME
+   APP LAYOUT
 ========================= */
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  font-weight: 700;
-  background: #121417; /* dark charcoal */
-  color: #f2f2f2;
-  margin: 0;
-  padding: 20px;
-  font-size: 20px;
-  line-height: 1.4;
-}
 
 .app {
   max-width: 540px;
@@ -48,82 +40,80 @@ body {
 h1 {
   font-size: 28px;
   font-weight: 800;
-  margin-bottom: 6px;
-  letter-spacing: 0.5px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 800;
 }
 
 p {
   color: #b5b5b5;
-  margin-top: 0;
-  margin-bottom: 14px;
   font-size: 20px;
 }
 
-small {
-  color: #9aa4b2;
-  font-size: 16px;
-}
-
 /* =========================
-   INPUTS
+   INPUT FIELD (BIG)
 ========================= */
-
-.input-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
 input {
   width: 100%;
   padding: 18px;
+  font-size: 34px;
+  font-weight: 800;
+  text-align: center;
+
   border-radius: 14px;
   border: 1px solid #2a2f3a;
+
   background: #1b1f24;
   color: #fff;
-  font-size: 34px; /* big amount field */
+}
+
+/* =========================
+   BUTTON RESET (CRITICAL)
+========================= */
+
+button {
+  all: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: Arial, sans-serif;
   font-weight: 800;
+  font-size: 22px;
+
+  padding: 16px;
+  border-radius: 14px;
+  cursor: pointer;
+
+  min-height: 56px;
   text-align: center;
 }
 
 /* =========================
-   BUTTONS
+   PRIMARY / SECONDARY BUTTONS
 ========================= */
 
-button {
-  font-family: Arial, sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  padding: 16px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  min-height: 56px;
-}
-
-/* Primary ADD TIP */
-#saveBtn {
+#saveBtn,
+#stickySaveBtn {
   background: #1ed760;
   color: #000;
 }
 
-#saveBtn:hover {
-  background: #17c653;
-}
-
-/* Delete */
 #deleteLast {
   background: #ef4444;
   color: #fff;
 }
 
-/* Secondary controls */
+/* fallback buttons */
 .controls button {
   background: #1b1f24;
-  color: #eaeaea;
+  color: #f2f2f2;
+  border: 1px solid #2a2f3a;
   margin-right: 8px;
   margin-top: 10px;
-  border: 1px solid #2a2f3a;
 }
 
 /* =========================
@@ -135,68 +125,33 @@ button {
 #result,
 #spainFlow {
   background: #1b1f24;
+  border: 1px solid #2a2f3a;
   padding: 16px;
   border-radius: 16px;
-  border: 1px solid #2a2f3a;
+
   box-shadow: 0 6px 18px rgba(0,0,0,0.35);
 }
 
 /* =========================
-   CATEGORY CHIPS (NEW UX)
+   SPACING SYSTEM
 ========================= */
 
-.category-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.category-chip {
-  padding: 14px 16px;
-  border-radius: 999px;
-  background: #1b1f24;
-  border: 1px solid #2a2f3a;
-  font-size: 20px;
-  cursor: pointer;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.category-chip.active {
-  background: #1ed760;
-  color: #000;
-  border-color: transparent;
+.app > * {
+  margin-bottom: 12px;
 }
 
 /* =========================
-   TRANSACTIONS (ANIMATION)
+   DIVIDER
 ========================= */
 
-.transaction {
-  background: #1b1f24;
-  border: 1px solid #2a2f3a;
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 10px;
-  animation: popIn 0.25s ease-out;
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+hr {
+  border: none;
+  border-top: 1px solid #2a2f3a;
+  margin: 16px 0;
 }
 
 /* =========================
-   PROGRESS BARS
+   PROGRESS BAR
 ========================= */
 
 .progress-bar {
@@ -220,7 +175,6 @@ button {
   min-height: 90px;
   position: relative;
   overflow: hidden;
-  margin-bottom: 14px;
 }
 
 .spain-flow-bar {
@@ -249,25 +203,31 @@ button {
 }
 
 /* =========================
-   DIVIDERS
+   TRANSACTIONS (IF USED)
 ========================= */
 
-hr {
-  border: none;
-  border-top: 1px solid #2a2f3a;
-  margin: 16px 0;
+.transaction {
+  background: #1b1f24;
+  border: 1px solid #2a2f3a;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  animation: popIn 0.25s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================
-   SPACING SYSTEM
-========================= */
-
-.app > * {
-  margin-bottom: 12px;
-}
-
-/* =========================
-   OPTIONAL: STICKY ACTION BAR
+   STICKY BUTTON
 ========================= */
 
 .sticky-action {
