@@ -8,7 +8,7 @@ const CAPS = {
 
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
-/* ---------------- MONTH TOTALS ---------------- */
+/* ---------------- CORE ---------------- */
 
 function getMonthTotals() {
   const now = new Date();
@@ -48,32 +48,31 @@ function addTip() {
 
   const totals = getMonthTotals();
 
-  let remaining = val;
-
-  const entry = {
+  // STEP 1: percentage split
+  let entry = {
     amount: val,
-    insurance: 0,
-    tax: 0,
-    amex: 0,
-    rent: 0,
-    ira: 0,
+    insurance: val * 0.12,
+    tax: val * 0.12,
+    amex: val * 0.40,
+    rent: val * 0.30,
+    ira: val * 0.04,
     spain: 0,
     time: new Date().toISOString()
   };
 
-  const order = ["insurance", "tax", "amex", "rent", "ira"];
+  // STEP 2: apply caps + collect overflow
+  let remaining = 0;
 
-  for (let key of order) {
+  for (let key of ["insurance", "tax", "amex", "rent", "ira"]) {
     const space = CAPS[key] - (totals[key] || 0);
 
-    if (space > 0) {
-      const used = Math.min(space, remaining);
-      entry[key] = used;
-      remaining -= used;
+    if (entry[key] > space) {
+      remaining += entry[key] - Math.max(0, space);
+      entry[key] = Math.max(0, space);
     }
   }
 
-  // 🇪🇸 overflow goes to Spain
+  // STEP 3: overflow → Spain
   entry.spain = remaining;
 
   tips.push(entry);
@@ -83,7 +82,7 @@ function addTip() {
   update();
 }
 
-/* ---------------- UPDATE UI ---------------- */
+/* ---------------- UI ---------------- */
 
 function update() {
   const total = tips.reduce((s, t) => s + t.amount, 0);
@@ -115,7 +114,7 @@ function update() {
   renderProgress();
 }
 
-/* ---------------- PROGRESS BARS ---------------- */
+/* ---------------- PROGRESS ---------------- */
 
 function renderProgress() {
   const totals = getMonthTotals();
@@ -140,13 +139,10 @@ function renderProgress() {
     `;
   }
 
-  // Spain fund bar
+  // Spain
   html += `
     <div style="margin-top:16px;">
       <strong>Spain Fund</strong> $${(totals.spain || 0).toFixed(2)}
-      <div style="background:#eee;height:10px;border-radius:5px;">
-        <div style="width:${Math.min(100, (totals.spain || 0) / 50 * 100)}%;height:10px;background:green;"></div>
-      </div>
     </div>
   `;
 
@@ -156,32 +152,25 @@ function renderProgress() {
 /* ---------------- RESET ---------------- */
 
 function bindReset() {
-  const monthBtn = document.getElementById("resetMonth");
-  const allBtn = document.getElementById("resetAll");
+  document.getElementById("resetMonth").onclick = () => {
+    const now = new Date();
+    const m = now.getMonth();
+    const y = now.getFullYear();
 
-  if (monthBtn) {
-    monthBtn.onclick = () => {
-      const now = new Date();
-      const m = now.getMonth();
-      const y = now.getFullYear();
+    tips = tips.filter(t => {
+      const d = new Date(t.time);
+      return !(d.getMonth() === m && d.getFullYear() === y);
+    });
 
-      tips = tips.filter(t => {
-        const d = new Date(t.time);
-        return !(d.getMonth() === m && d.getFullYear() === y);
-      });
+    localStorage.setItem("tips", JSON.stringify(tips));
+    update();
+  };
 
-      localStorage.setItem("tips", JSON.stringify(tips));
-      update();
-    };
-  }
-
-  if (allBtn) {
-    allBtn.onclick = () => {
-      tips = [];
-      localStorage.removeItem("tips");
-      update();
-    };
-  }
+  document.getElementById("resetAll").onclick = () => {
+    tips = [];
+    localStorage.removeItem("tips");
+    update();
+  };
 }
 
 /* ---------------- INIT ---------------- */
