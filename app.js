@@ -115,3 +115,22 @@ if (document.readyState === "loading") {
 } else {
   bind();
 }
+document.getElementById("resetMonth").onclick = () => {
+  const now = new Date();
+  const m = now.getMonth();
+  const y = now.getFullYear();
+
+  tips = tips.filter(t => {
+    let d = new Date(t.time);
+    return !(d.getMonth() === m && d.getFullYear() === y);
+  });
+
+  localStorage.setItem("tips", JSON.stringify(tips));
+  update();
+};
+
+document.getElementById("resetAll").onclick = () => {
+  tips = [];
+  localStorage.removeItem("tips");
+  update();
+};
