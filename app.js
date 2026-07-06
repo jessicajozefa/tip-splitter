@@ -8,7 +8,7 @@ const CAPS = {
 
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
-/* ---------- CORE CALC ---------- */
+/* ---------------- CORE ---------------- */
 
 function getMonthTotals() {
   const now = new Date();
@@ -39,29 +39,7 @@ function getMonthTotals() {
   return totals;
 }
 
-  let totals = {
-    insurance: 0,
-    tax: 0,
-    amex: 0,
-    rent: 0,
-    ira: 0
-  };
-
-  tips.forEach(t => {
-    const d = new Date(t.time);
-    if (d.getMonth() === m && d.getFullYear() === y) {
-      totals.insurance += t.insurance;
-      totals.tax += t.tax;
-      totals.amex += t.amex;
-      totals.rent += t.rent;
-      totals.ira += t.ira;
-    }
-  });
-
-  return totals;
-}
-
-/* ---------- ADD TIP ---------- */
+/* ---------------- ADD TIP ---------------- */
 
 function addTip() {
   const input = document.getElementById("amount");
@@ -70,18 +48,7 @@ function addTip() {
 
   const totals = getMonthTotals();
 
-  let entry = {
-    amount: val,
-    insurance: val * 0.12,
-    tax: val * 0.12,
-    amex: val * 0.40,
-    rent: val * 0.30,
-    ira: val * 0.04,
-    time: new Date().toISOString()
-  };
-
-  // apply caps
-  entry = applyCaps(entry, totals);
+  const entry = allocate(val, totals);
 
   tips.push(entry);
   localStorage.setItem("tips", JSON.stringify(tips));
@@ -90,20 +57,41 @@ function addTip() {
   update();
 }
 
-/* ---------- CAPS LOGIC ---------- */
+/* ---------------- ALLOCATION ENGINE ---------------- */
 
-function applyCaps(entry, totals) {
-  const result = { ...entry };
+function allocate(amount, totals) {
+  let remaining = amount;
 
-  for (let key in CAPS) {
+  const entry = {
+    amount,
+    insurance: 0,
+    tax: 0,
+    amex: 0,
+    rent: 0,
+    ira: 0,
+    spain: 0,
+    time: new Date().toISOString()
+  };
+
+  const order = ["insurance", "tax", "amex", "rent", "ira"];
+
+  for (let key of order) {
     const space = CAPS[key] - (totals[key] || 0);
-    result[key] = Math.max(0, Math.min(entry[key] || 0, space));
+
+    if (space > 0) {
+      const used = Math.min(space, remaining);
+      entry[key] = used;
+      remaining -= used;
+    }
   }
 
-  return result;
+  // 🇪🇸 overflow
+  entry.spain = remaining;
+
+  return entry;
 }
 
-/* ---------- UI RENDER ---------- */
+/* ---------------- UPDATE UI ---------------- */
 
 function update() {
   const total = tips.reduce((s, t) => s + t.amount, 0);
@@ -119,7 +107,8 @@ function update() {
           Taxes: $${t.tax.toFixed(2)} |
           Amex: $${t.amex.toFixed(2)} |
           Rent: $${t.rent.toFixed(2)} |
-          IRA: $${t.ira.toFixed(2)}
+          IRA: $${t.ira.toFixed(2)} |
+          Spain: $${t.spain.toFixed(2)}
         </small>
       </div>
     `;
@@ -134,7 +123,7 @@ function update() {
   renderProgress();
 }
 
-/* ---------- PROGRESS ---------- */
+/* ---------------- PROGRESS ---------------- */
 
 function renderProgress() {
   const totals = getMonthTotals();
@@ -159,10 +148,20 @@ function renderProgress() {
     `;
   }
 
+  // Spain fund
+  html += `
+    <div style="margin-top:16px;">
+      <strong>Spain Fund</strong> $${totals.spain.toFixed(2)}
+      <div style="background:#eee;height:10px;border-radius:5px;">
+        <div style="width:${Math.min(100, totals.spain / 50 * 100)}%;height:10px;background:green;"></div>
+      </div>
+    </div>
+  `;
+
   document.getElementById("progress").innerHTML = html;
 }
 
-/* ---------- RESET ---------- */
+/* ---------------- RESET ---------------- */
 
 function bindReset() {
   document.getElementById("resetMonth").onclick = () => {
@@ -186,7 +185,7 @@ function bindReset() {
   };
 }
 
-/* ---------- INIT ---------- */
+/* ---------------- INIT ---------------- */
 
 function init() {
   document.getElementById("saveBtn").onclick = addTip;
