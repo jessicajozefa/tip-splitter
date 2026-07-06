@@ -125,3 +125,4 @@ function update() {
 }
 
 update();
+document.getElementById("saveBtn").addEventListener("click", addTip);
