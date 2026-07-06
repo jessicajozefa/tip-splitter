@@ -8,7 +8,7 @@ const CAPS = {
 
 let tips = JSON.parse(localStorage.getItem("tips") || "[]");
 
-/* ---------------- CORE ---------------- */
+/* ---------------- MONTH TOTALS ---------------- */
 
 function getMonthTotals() {
   const now = new Date();
@@ -48,22 +48,10 @@ function addTip() {
 
   const totals = getMonthTotals();
 
-  const entry = allocate(val, totals);
-
-  tips.push(entry);
-  localStorage.setItem("tips", JSON.stringify(tips));
-
-  input.value = "";
-  update();
-}
-
-/* ---------------- ALLOCATION ENGINE ---------------- */
-
-function allocate(amount, totals) {
-  let remaining = amount;
+  let remaining = val;
 
   const entry = {
-    amount,
+    amount: val,
     insurance: 0,
     tax: 0,
     amex: 0,
@@ -85,10 +73,14 @@ function allocate(amount, totals) {
     }
   }
 
-  // 🇪🇸 overflow
+  // 🇪🇸 overflow goes to Spain
   entry.spain = remaining;
 
-  return entry;
+  tips.push(entry);
+  localStorage.setItem("tips", JSON.stringify(tips));
+
+  input.value = "";
+  update();
 }
 
 /* ---------------- UPDATE UI ---------------- */
@@ -123,7 +115,7 @@ function update() {
   renderProgress();
 }
 
-/* ---------------- PROGRESS ---------------- */
+/* ---------------- PROGRESS BARS ---------------- */
 
 function renderProgress() {
   const totals = getMonthTotals();
@@ -148,12 +140,12 @@ function renderProgress() {
     `;
   }
 
-  // Spain fund
+  // Spain fund bar
   html += `
     <div style="margin-top:16px;">
-      <strong>Spain Fund</strong> $${totals.spain.toFixed(2)}
+      <strong>Spain Fund</strong> $${(totals.spain || 0).toFixed(2)}
       <div style="background:#eee;height:10px;border-radius:5px;">
-        <div style="width:${Math.min(100, totals.spain / 50 * 100)}%;height:10px;background:green;"></div>
+        <div style="width:${Math.min(100, (totals.spain || 0) / 50 * 100)}%;height:10px;background:green;"></div>
       </div>
     </div>
   `;
@@ -164,25 +156,32 @@ function renderProgress() {
 /* ---------------- RESET ---------------- */
 
 function bindReset() {
-  document.getElementById("resetMonth").onclick = () => {
-    const now = new Date();
-    const m = now.getMonth();
-    const y = now.getFullYear();
+  const monthBtn = document.getElementById("resetMonth");
+  const allBtn = document.getElementById("resetAll");
 
-    tips = tips.filter(t => {
-      const d = new Date(t.time);
-      return !(d.getMonth() === m && d.getFullYear() === y);
-    });
+  if (monthBtn) {
+    monthBtn.onclick = () => {
+      const now = new Date();
+      const m = now.getMonth();
+      const y = now.getFullYear();
 
-    localStorage.setItem("tips", JSON.stringify(tips));
-    update();
-  };
+      tips = tips.filter(t => {
+        const d = new Date(t.time);
+        return !(d.getMonth() === m && d.getFullYear() === y);
+      });
 
-  document.getElementById("resetAll").onclick = () => {
-    tips = [];
-    localStorage.removeItem("tips");
-    update();
-  };
+      localStorage.setItem("tips", JSON.stringify(tips));
+      update();
+    };
+  }
+
+  if (allBtn) {
+    allBtn.onclick = () => {
+      tips = [];
+      localStorage.removeItem("tips");
+      update();
+    };
+  }
 }
 
 /* ---------------- INIT ---------------- */
