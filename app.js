@@ -1,4 +1,29 @@
-const CAPS = {
+function getMonthTotals() {
+  const now = new Date();
+  const m = now.getMonth();
+  const y = now.getFullYear();
+
+  let totals = {
+    insurance: 0,
+    tax: 0,
+    amex: 0,
+    rent: 0,
+    ira: 0
+  };
+
+  tips.forEach(t => {
+    const d = new Date(t.time);
+    if (d.getMonth() === m && d.getFullYear() === y) {
+      totals.insurance += t.insurance;
+      totals.tax += t.tax;
+      totals.amex += t.amex;
+      totals.rent += t.rent;
+      totals.ira += t.ira;
+    }
+  });
+
+  return totals;
+}const CAPS = {
   insurance: 622,
   tax: 600,
   amex: 2000,
