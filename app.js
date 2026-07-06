@@ -64,5 +64,16 @@ function render(val, alloc) {
 
     <hr>
     <p>🇪🇸 Spain Fund: $${totals.spain.toFixed(2)}</p>
+    function updateDashboard() {
+  document.getElementById("dashboard").innerHTML = `
+    🩺 Insurance: $${totals.insurance.toFixed(2)} / 622<br>
+    🧾 Taxes: $${totals.tax.toFixed(2)} / 600<br>
+    💳 Amex: $${totals.amex.toFixed(2)} / 2000<br>
+    🏠 Rent: $${totals.rent.toFixed(2)} / 1500<br>
+    🏦 IRA: $${totals.ira.toFixed(2)} / 200<br>
+    <br>
+    🇪🇸 Spain Fund: $${totals.spain.toFixed(2)}
+  `;
+}
   `;
 }
